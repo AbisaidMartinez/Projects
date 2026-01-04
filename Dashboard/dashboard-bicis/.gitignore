@@ -1,0 +1,6 @@
+# .gitignore
+.toml
+.streamlit
+__pycache__
+.DS_Store
+
