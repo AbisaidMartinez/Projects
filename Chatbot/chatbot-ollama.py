@@ -28,16 +28,6 @@ if "messages" not in st.session_state:
     
 modelos = [modelo["model"] for modelo in ollama.list()["models"]]
 st.session_state["modelo"] = st.selectbox("Select the model", modelos)
-        
-    # def respuesta_modelo():
-    #     stream = ollama.chat(
-    #         model=st.session_state["modelo"],
-    #         messages=st.session_state["messages"], #[{'role': 'user', 'content': '¿Por qué es azul el cielo?'}],
-    #         stream = True)
-        
-    #     # Mostrar la respuesta generada por el modelo
-    #     for chunk in stream:    
-    #         yield chunk['message']['content']
             
 for mensaje in st.session_state["messages"]:
     with st.chat_message(mensaje["role"]):
