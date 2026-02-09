@@ -127,7 +127,6 @@ forecast = res.get_forecast(steps=3)
 pred = forecast.predicted_mean
 conf_int = forecast.conf_int()
 
-#from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 #%% Visualización
 
@@ -184,10 +183,11 @@ for mun, serie in series_num.items():
     pred = res.get_forecast(steps=3).predicted_mean
     
     forecast_mun[mun] = pred.mean()
-    
+#%%
 ranking_mun = (pd.Series(forecast_mun).sort_values())
 municipios_desc = ranking_mun.head(3)
 
+print(municipios_desc)
 
 #%% Actividad 2.5 (3 Modalidades de Robo)
 
@@ -234,3 +234,5 @@ for mod, serie in series_mod.items():
 ranking_mod = (pd.Series(forecast_mod).sort_values())
 
 modalidades_descuento = ranking_mod.head(3)
+
+print(modalidades_descuento)
