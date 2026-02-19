@@ -377,3 +377,74 @@ residuales = train_ventana[1:] - pred_is[1:]
 
 print("Media de los residuos: ", residuales.mean())
 print("Desviacón Estandar: ", residuales.std())
+
+#%% 
+
+#Adquirir la Serie de Tiempo 
+df_time = serie.index.tolist()
+df_time
+
+fechas = []
+
+#Convertir a formato date
+for i in df_time:
+    fechas.append(i.date())
+
+day_month = []
+for j in fechas:
+    day_month.append((j.day, j.month))
+    
+#%%
+festivos = {(1,1), (19,1), (16,2), (25,5), 
+            (19,6), (3,7), (7,9), (12,10), 
+            (11,11), (26,11), (25,12)}
+
+exog_values = []
+for dm in day_month:
+    if dm in festivos:
+        exog_values.append(1)
+    else:
+        exog_values.append(0)
+#%%
+exog_train_full = exog_values[:-H]
+exog_test       = exog_values[-H:]
+
+exog_ventana = exog_train_full[-VENTANA:]
+
+#%% Entrenamiento y evaluacion variables exogenas
+
+p, d, q = 1, 1, 0
+P, D, Q, s = 1, 0, 2, 24
+
+modelo = SARIMAX(train_ventana, 
+                 order=(p,d,q), 
+                 seasonal_order=(P,D,Q,s),
+                 exog=exog_ventana).fit(disp=False)
+
+pred_is = modelo.predict(exog=exog_ventana)
+
+residuales = train_ventana[1:] - pred_is[1:]
+
+print("Media de los residuos: ", residuales.mean())
+print("Desviacón Estandar: ", residuales.std())
+
+#%%
+
+prons_exog = modelo.get_forecast(steps=H, exog=exog_test)
+prons_df_exog = prons_exog.summary_frame(alpha=0.05)
+prons_df_exog
+
+#%%
+fig, ax = plt.subplots(figsize=(12,5))
+sns.lineplot(test, linestyle='--', label='Test Set')
+sns.lineplot(prons_df_exog, x=prons_df_exog.index, y='mean', 
+             linestyle='--', color='r', label=f'Pronostico {H} horas con SARIMA')
+plt.fill_between(x=prons_df_exog.index, y1=prons_df_exog["mean_ci_lower"], 
+                 y2=prons_df_exog["mean_ci_upper"],
+                 color='red',
+                 alpha=0.2,
+                 label='Intervalo de Confianza (95%)')
+ax.set_xlabel('Fecha')
+ax.set_ylabel('Demanda energetica (MW)')
+ax.grid(True)
+ax.legend(loc="lower left")
